@@ -30,7 +30,6 @@ async def load_achievement(message: types.Message, state=FSMContext):
     await sqlite_db.sql_add_achievement(state)
     await state.finish()
     await bot.delete_message(message.chat.id, message.message_id-1)
-    print(message.chat.id)
     await message.delete()
     await message.answer("Отлично! Достижение добавлено!\n\nВы вернулись в главное меню.\nВыберите раздел:", reply_markup=first_choise)
 
