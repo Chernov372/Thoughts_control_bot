@@ -1,10 +1,14 @@
 from aiogram import types, Dispatcher
 from keyboards import first_choise
 from create_bot import dp
+from data_base import sqlite_db
 
 
 
 async def command_start(message: types.Message):
+    print(message)
+    await sqlite_db.sql_user_add(message.chat.id, message.chat.first_name, message.chat.last_name, message.chat.username)
+    await message.answer("Начало")
     await message.answer(f'Привет, {message.from_user.first_name}! Выбери раздел:', reply_markup=first_choise)
     await message.delete()
 

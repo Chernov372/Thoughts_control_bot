@@ -1,5 +1,5 @@
 from aiogram import executor
-from create_bot import dp
+from create_bot import dp, bot
 from main import event_handler, main_handler, achievement_handler, bdi_test_handler, bai_test_handler, test_choise_handler
 from data_base import sql_start
 # from create_bot import bot

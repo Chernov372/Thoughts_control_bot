@@ -46,6 +46,17 @@ def sql_start():
         """)
     con.commit()
 
+# USER TABLE QUERIES
+
+async def sql_user_add(user_id, first_name, last_name, user_name):
+    try:
+        cur.execute("""INSERT INTO users (user_id, first_name, last_name, user_name) 
+                    VALUES (?, ?, ?, ?)""", (user_id, first_name, last_name, user_name))
+        con.commit()
+    except:
+        pass
+
+
 
 # EVENTS QUERIES
 

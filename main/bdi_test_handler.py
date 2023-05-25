@@ -4,7 +4,6 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from keyboards import bdi_test_kb, bdi_test_answers_kb, bdi_test_start_kb, first_choise, bdi_test_dinamics_kb, bdi_test_end_kb
 from forms import bdi_test_questions
-# from create_bot import bot
 
 
 questions = bdi_test_questions.male_questions
