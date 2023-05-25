@@ -40,6 +40,7 @@ async def load_good_or_bad(callback_query: types.CallbackQuery, state=FSMContext
         await callback_query.message.answer("Переживание не было записано.\n\nВы вернулись в главное меню.\nВыберите раздел:", reply_markup=first_choise)
     else:
         async with state.proxy() as data:
+            data['user_id'] = callback_query.message.chat.id
             if answer == 'good':
                 data['good_or_bad'] = answer
             elif answer == 'bad':
@@ -117,7 +118,7 @@ class FSM_event_date(StatesGroup):
 
 async def choose_event_year(cbq: types.CallbackQuery):
     year_buttons = []
-    years = await sqlite_db.sql_get_events_years()
+    years = await sqlite_db.sql_get_events_years(cbq.message.chat.id)
     if years == []:
         await cbq.message.answer("Вы ещё не записали ни одного переживания. Начнём с начала", reply_markup=first_choise)
     else:
@@ -138,7 +139,7 @@ async def load_event_date_year(cbq: types.CallbackQuery, state=FSMContext):
         data['event_year'] = year
     #creating keyboard for months
     months_buttons = []
-    months = await sqlite_db.sql_get_events_months(data['event_year'])
+    months = await sqlite_db.sql_get_events_months(cbq.message.chat.id, data['event_year'])
     months_dict = {
         '1': 'Январь',
         '2': 'Февраль',
@@ -158,8 +159,8 @@ async def load_event_date_year(cbq: types.CallbackQuery, state=FSMContext):
     events_months_kb = InlineKeyboardMarkup(row_width=4)
     events_months_kb.add(*months_buttons)
     # quiering qty of good and bad events in a chosen year
-    good_events_qty_year = await sqlite_db.sql_count_events_year('good', data['event_year'])
-    bad_events_qty_year = await sqlite_db.sql_count_events_year('bad', data['event_year'])
+    good_events_qty_year = await sqlite_db.sql_count_events_year(cbq.message.chat.id, 'good', data['event_year'])
+    bad_events_qty_year = await sqlite_db.sql_count_events_year(cbq.message.chat.id, 'bad', data['event_year'])
     await FSM_event_date.next()
     await cbq.message.answer(f"Количество переживаний в этом году:\nХороших: {good_events_qty_year[0][0]}\nПлохих: {bad_events_qty_year[0][0]}\nВыберите месяц из которго вы хотите вспомнить переживание:", reply_markup=events_months_kb)
     await cbq.message.delete()
@@ -173,14 +174,14 @@ async def load_event_date_month(cbq: types.CallbackQuery, state=FSMContext):
         data['event_month'] = month
     #making a keyboard of days
     days_buttons = []
-    days = await sqlite_db.sql_get_events_days(data['event_year'], data['event_month'])
+    days = await sqlite_db.sql_get_events_days(cbq.message.chat.id, data['event_year'], data['event_month'])
     for day in days:
         days_buttons.append(InlineKeyboardButton(text=day[0], callback_data=f"event_day_{day[0]}"))
     events_days_kb = InlineKeyboardMarkup(row_width=6)
     events_days_kb.add(*days_buttons)
     # quiering qty of good and bad events in a chosen month
-    good_events_qty_month = await sqlite_db.sql_count_events_month('good', data['event_year'], data['event_month'])
-    bad_events_qty_month = await sqlite_db.sql_count_events_month('bad', data['event_year'], data['event_month'])
+    good_events_qty_month = await sqlite_db.sql_count_events_month(cbq.message.chat.id, 'good', data['event_year'], data['event_month'])
+    bad_events_qty_month = await sqlite_db.sql_count_events_month(cbq.message.chat.id, 'bad', data['event_year'], data['event_month'])
     await FSM_event_date.next()
     await cbq.message.answer(f"Количество переживаний в этом месяце:\nХороших: {good_events_qty_month[0][0]}\nПлохих: {bad_events_qty_month[0][0]}\nВыберите день из которго вы хотите вспомнить переживание:", reply_markup=events_days_kb)
     await cbq.message.delete()
@@ -194,7 +195,7 @@ async def load_event_date_day(cbq: types.CallbackQuery, state=FSMContext):
         data['event_day'] = day
     #making a keyboard of events
     events_buttons = []
-    events = await sqlite_db.sql_get_events_id(data['event_year'], data['event_month'], data['event_day'])
+    events = await sqlite_db.sql_get_events_id(cbq.message.chat.id, data['event_year'], data['event_month'], data['event_day'])
     for event in events:
         if event[0] == "good":
             events_buttons.append(InlineKeyboardButton(text=f"(приятное) \n{event[2][:25]}...", callback_data=f"event_id_{event[1]}"))
@@ -203,8 +204,8 @@ async def load_event_date_day(cbq: types.CallbackQuery, state=FSMContext):
     events_kb = InlineKeyboardMarkup(row_width=1)
     events_kb.add(*events_buttons)
     # quiering qty of good and bad events in a chosen day
-    good_events_qty_day = await sqlite_db.sql_count_events_day('good', data['event_year'], data['event_month'], data['event_day'])
-    bad_events_qty_day = await sqlite_db.sql_count_events_day('bad', data['event_year'], data['event_month'], data['event_day'])
+    good_events_qty_day = await sqlite_db.sql_count_events_day(cbq.message.chat.id, 'good', data['event_year'], data['event_month'], data['event_day'])
+    bad_events_qty_day = await sqlite_db.sql_count_events_day(cbq.message.chat.id, 'bad', data['event_year'], data['event_month'], data['event_day'])
     await FSM_event_date.next()
     await cbq.message.answer(f"Количество переживаний в этот день:\nХороших: {good_events_qty_day[0][0]}\nПлохих: {bad_events_qty_day[0][0]}\nВыберите какое имнно переживание вы хотите вспомнить:", reply_markup=events_kb)
     await cbq.message.delete()
@@ -214,12 +215,12 @@ async def load_event_date_day(cbq: types.CallbackQuery, state=FSMContext):
 
 async def get_chosen_event(cbq: types.CallbackQuery, state=FSMContext):
     event_id = str(cbq.data.split('_')[2])
-    event = await sqlite_db.sql_get_chosen_event(event_id)
+    event = await sqlite_db.sql_get_chosen_event(cbq.message.chat.id, event_id)
     await state.finish()
     await cbq.message.answer(f"""Ваше переживание:
 
 ***
-Вот этот день: {event[0]}\n
+В этот день произошло: {event[0]}\n
 В этот момент вы ощущали в теле: {event[1]}\n
 Это переживание сопровождали следующее настроение и чувства: {event[2]}\n
 В момент этого переживания Вас посещали следующие мысли: {event[3]}\n

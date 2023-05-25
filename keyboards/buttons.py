@@ -1,5 +1,4 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from data_base import sqlite_db
 
 
 first_choise = InlineKeyboardMarkup(row_width=1)

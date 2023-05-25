@@ -26,6 +26,7 @@ async def achievements_record(cbq: types.CallbackQuery, state=None):
 # Describing new achievement
 async def load_achievement(message: types.Message, state=FSMContext):
     async with state.proxy() as data:
+        data['user_id'] = message.chat.id
         data['achievement'] = message.text
     await sqlite_db.sql_add_achievement(state)
     await state.finish()
@@ -36,7 +37,7 @@ async def load_achievement(message: types.Message, state=FSMContext):
 
 # COUNTING ACHIEVEMENTS BUTTON
 async def count_achievemnts(cbq: types.CallbackQuery):
-    answer = await sqlite_db.sql_count_achievements()
+    answer = await sqlite_db.sql_count_achievements(cbq.message.chat.id)
     last_digits = ('2', '3', '4')
     if str(answer).endswith(last_digits):
         await cbq.message.answer(f"У тебя уже {answer} достижения!\n\nВы вернулись в главное меню.\nВыберите раздел:", reply_markup=first_choise)

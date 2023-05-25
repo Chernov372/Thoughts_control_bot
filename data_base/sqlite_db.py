@@ -5,8 +5,17 @@ def sql_start():
     global con, cur
     con = sqlite3.connect('tutorial.db')
     cur = con.cursor()
+    cur.execute("""CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY,
+        user_name TEXT,
+        first_name TEXT,
+        last_name TEXT,
+        gender TEXT);
+        """)
+    
     cur.execute("""CREATE TABLE IF NOT EXISTS events (
         event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
         event_year DATETIME NOT NULL DEFAULT (strftime('%Y', 'now', 'localtime')),
         event_month DATETIME NOT NULL DEFAULT (strftime('%m', 'now', 'localtime')),
         event_day DATETIME NOT NULL DEFAULT (strftime('%d', 'now', 'localtime')),
@@ -19,16 +28,19 @@ def sql_start():
         """)
     cur.execute("""CREATE TABLE IF NOT EXISTS achievements (
         achievement_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
         achievement_date DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%d', 'now', 'localtime')),
         achievement TEXT);
         """)
     cur.execute("""CREATE TABLE IF NOT EXISTS bdi_test_results (
         result_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
         date DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%d', 'now', 'localtime')),
         result INTEGER);
         """)
     cur.execute("""CREATE TABLE IF NOT EXISTS bai_test_results (
         result_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
         date DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%d', 'now', 'localtime')),
         result INTEGER);
         """)
@@ -40,80 +52,85 @@ def sql_start():
 # Insert new event
 async def sql_add_event(state):
     async with state.proxy() as data:
-        cur.execute("""INSERT INTO events 
-        (event_id, good_or_bad, event, physical, feelings, thoughts, current_thoughts) 
-        VALUES (NULL, ?, ?, ?, ?, ?, ?)""", tuple(data.values()))
+        cur.execute("""INSERT INTO events
+        (event_id, user_id, good_or_bad, event, physical, feelings, thoughts, current_thoughts) 
+        VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)""", tuple(data.values()))
         con.commit()
 
 
 # Get all events
-async def sql_get_events_all():
-    cur.execute("SELECT * FROM events")
+async def sql_get_events_all(user_id):
+    cur.execute("SELECT * FROM events WHERE user_id=?", (user_id,))
     rows = cur.fetchall()
     return rows
 
 # Get events years
-async def sql_get_events_years():
-    cur.execute("SELECT DISTINCT event_year FROM events")
+async def sql_get_events_years(user_id):
+    cur.execute("SELECT DISTINCT event_year FROM events WHERE user_id=?", (user_id,))
     event_years = cur.fetchall()
     return event_years
 
 # Get events months
-async def sql_get_events_months(year):
-    cur.execute("SELECT DISTINCT event_month FROM events WHERE event_year=?", (year,))
+async def sql_get_events_months(user_id, year):
+    cur.execute("SELECT DISTINCT event_month FROM events WHERE event_year=? AND user_id=?", (year, user_id,))
     months = cur.fetchall()
     return months
 
 #Get good or bad events in a year
-async def sql_count_events_year(good_or_bad, year):
+async def sql_count_events_year(user_id, good_or_bad, year):
     cur.execute("""SELECT COUNT(*) 
                     FROM events 
                     WHERE good_or_bad=?
-                    AND event_year=?""", (good_or_bad, year,))
+                    AND event_year=? AND user_id=?""", (good_or_bad, year, user_id,))
     months = cur.fetchall()
     return months
 
 # Get events days
-async def sql_get_events_days(year, month):
-    cur.execute("SELECT DISTINCT event_day FROM events WHERE event_year=? AND event_month=?", (year, month,))
+async def sql_get_events_days(user_id, year, month):
+    cur.execute("SELECT DISTINCT event_day FROM events WHERE user_id=? AND event_year=? AND event_month=?", (user_id, year, month,))
     days = cur.fetchall()
     return days
 
 #Get good or bad events in a month
-async def sql_count_events_month(good_or_bad, year, month):
+async def sql_count_events_month(user_id, good_or_bad, year, month):
     cur.execute("""SELECT COUNT(*) 
                     FROM events 
-                    WHERE good_or_bad=?
-                    AND event_year=? AND event_month=?""", (good_or_bad, year, month,))
+                    WHERE user_id=?
+                    AND good_or_bad=?
+                    AND event_year=?
+                    AND event_month=?""", (user_id, good_or_bad, year, month,))
     events_qty = cur.fetchall()
     return events_qty
 
 # Get events in a day
-async def sql_get_events_id(year, month, day):
+async def sql_get_events_id(user_id, year, month, day):
     cur.execute("""SELECT good_or_bad, event_id, event 
                 FROM events 
-                WHERE event_year=? 
+                WHERE user_id=?
+                AND event_year=? 
                 AND event_month=? 
-                AND event_day=?""", (year, month, day,))
+                AND event_day=?""", (user_id, year, month, day,))
     ids = cur.fetchall()
     return ids
 
 #Get good or bad events in a day
-async def sql_count_events_day(good_or_bad, year, month, day):
+async def sql_count_events_day(user_id, good_or_bad, year, month, day):
     cur.execute("""SELECT COUNT(*) 
                     FROM events 
-                    WHERE good_or_bad=?
+                    WHERE user_id=?
+                    AND good_or_bad=?
                     AND event_year=? 
                     AND event_month=?
-                    AND event_day=?""", (good_or_bad, year, month, day,))
+                    AND event_day=?""", (user_id, good_or_bad, year, month, day,))
     events_qty = cur.fetchall()
     return events_qty
 
 # Get chosen event
-async def sql_get_chosen_event(event_id):
+async def sql_get_chosen_event(user_id, event_id):
     cur.execute("""SELECT event, physical,feelings,thoughts, current_thoughts 
                     FROM events
-                    WHERE event_id=?""", (event_id,))
+                    WHERE user_id=?
+                    AND event_id=?""", (user_id, event_id,))
     event_description = cur.fetchall()
     return event_description[0]
 
@@ -124,13 +141,13 @@ async def sql_get_chosen_event(event_id):
 async def sql_add_achievement(state):
     async with state.proxy() as data:
         cur.execute("""INSERT INTO achievements 
-            (achievement_id, achievement) 
-            VALUES (NULL, ?)""", tuple(data.values()))
+            (achievement_id, user_id, achievement) 
+            VALUES (NULL, ?, ?)""", tuple(data.values()))
         con.commit()
 
 # Get total qty of achievements
-async def sql_count_achievements():
-    cur.execute("SELECT COUNT(*) FROM achievements")
+async def sql_count_achievements(user_id):
+    cur.execute("SELECT COUNT(*) FROM achievements WHERE user_id=?", (user_id,))
     rows = cur.fetchall()[0][0]
     return rows
 
