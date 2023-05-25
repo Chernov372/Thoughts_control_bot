@@ -43,9 +43,18 @@ b35 = InlineKeyboardButton(text="Уровень тревоги", callback_data="
 
 
 # FIRST CHOISE KEYBOARDS
-first_choise = InlineKeyboardMarkup(row_width=1)
-first_choise.row(b8, b9).add(b13).add(b10)
+# first_choise = InlineKeyboardMarkup(row_width=1)
+# first_choise.row(b8, b9).add(b13).add(b10)
 
+
+
+
+
+first_choise = InlineKeyboardMarkup(row_width=1)
+first_choise.row(InlineKeyboardButton(text="Переживания", callback_data="events"), 
+                 InlineKeyboardButton(text="Достижения", callback_data="achievements"), 
+                 InlineKeyboardButton(text="Отслеживание состояния", callback_data="tests"), 
+                 InlineKeyboardButton(text="Теория", callback_data="theory"))
 
 # ACHIEVEMENTS KEYBOARD
 achievements_choise = InlineKeyboardMarkup(row_width=1)
