@@ -3,10 +3,8 @@ from data_base import sqlite_db
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from keyboards import bdi_test_kb, bdi_test_answers_kb, bdi_test_start_kb, first_choise, bdi_test_dinamics_kb, bdi_test_end_kb
-from forms import bdi_test_questions
+from forms.bdi_test_questions import male_questions, female_questions
 
-
-questions = bdi_test_questions.male_questions
 
 
 # CBI TEST FIRST CHOISE
@@ -40,6 +38,10 @@ async def bdi_test_questions(cbq: types.CallbackQuery, state=FSMContext):
         await cbq.message.delete()
         await cbq.message.answer("Прохождение теста отменено.\n\nПродолжим работу\nВыберите раздел:", reply_markup=first_choise)
     else:
+        if (await sqlite_db.sql_user_gender_get(cbq.message.chat.id)) == 'male':
+            questions = male_questions
+        elif (await sqlite_db.sql_user_gender_get(cbq.message.chat.id)) == 'female':
+            questions = female_questions
         q_num = (await state.get_data())['q_num']
         if cbq.data.startswith('bdi_test_answer'):
             answer = int(cbq.data.split('_')[3])

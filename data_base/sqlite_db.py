@@ -12,7 +12,6 @@ def sql_start():
         last_name TEXT,
         gender TEXT);
         """)
-    
     cur.execute("""CREATE TABLE IF NOT EXISTS events (
         event_id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
@@ -56,6 +55,14 @@ async def sql_user_add(user_id, first_name, last_name, user_name):
     except:
         pass
 
+async def sql_user_gender_add(user_id, gender):
+    cur.execute("UPDATE users SET gender=? WHERE user_id=?", (gender, user_id))
+    con.commit()
+
+async def sql_user_gender_get(user_id):
+    cur.execute("SELECT gender FROM users WHERE user_id=?", (user_id,))
+    gender = cur.fetchall()
+    return gender[0][0]
 
 
 # EVENTS QUERIES

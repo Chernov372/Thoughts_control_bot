@@ -108,3 +108,7 @@ test_kb.add(InlineKeyboardButton(text="Уровень депрессии", callb
             InlineKeyboardButton(text="В главное меню", callback_data="cancel"))
 
 
+# GENDER CHOISE KEYBOARD
+gender_choice_kb = InlineKeyboardMarkup(row_width=1)
+gender_choice_kb.add(InlineKeyboardButton(text="Мужской", callback_data="gender_male"),
+            InlineKeyboardButton(text="Женский", callback_data="gender_female"))
