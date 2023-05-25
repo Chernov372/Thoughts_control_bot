@@ -154,63 +154,63 @@ async def sql_count_achievements(user_id):
 # BDI TEST QUERIES
 
 # Insert a new result
-async def sql_bditest_insert_result(result):
-    cur.execute("INSERT INTO bdi_test_results (result) VALUES (?)", tuple([result]))
+async def sql_bditest_insert_result(user_id, result):
+    cur.execute("INSERT INTO bdi_test_results (user_id, result) VALUES (?, ?)", (user_id, result))
     con.commit()
 
 
 # Get last result
-async def sql_bditest_last_result():
-    cur.execute("SELECT result FROM bdi_test_results ORDER BY result_id DESC LIMIT 1")
+async def sql_bditest_last_result(user_id):
+    cur.execute("SELECT result FROM bdi_test_results WHERE user_id=? ORDER BY result_id DESC LIMIT 1", (user_id,))
     result = cur.fetchall()
     return result
 
 # Get last week averege
-async def sql_bditest_lastweek_result():
-    cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')")
+async def sql_bditest_lastweek_result(user_id):
+    cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')", (user_id,))
     result = cur.fetchall()
     return result
 
 # Get a week before averege
-async def sql_bditest_previousweek_result():
-    cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE date BETWEEN datetime('now', '-13 days') AND datetime('now', '-6 days')")
+async def sql_bditest_previousweek_result(user_id):
+    cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-13 days') AND datetime('now', '-6 days')", (user_id,))
     result = cur.fetchall()
     return result
 
 # Get a current month averege
-async def sql_bditest_currentmonth_result():
-    cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE date BETWEEN datetime('now', '-30 days') AND datetime('now', 'localtime')")
+async def sql_bditest_currentmonth_result(user_id):
+    cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-30 days') AND datetime('now', 'localtime')", (user_id,))
     result = cur.fetchall()
     return result
 
 
 # BAI TEST QUERIES
 # Insert a new result
-async def sql_baitest_insert_result(result):
-    cur.execute("INSERT INTO bai_test_results (result) VALUES (?)", tuple([result]))
+async def sql_baitest_insert_result(user_id, result):
+    cur.execute("INSERT INTO bai_test_results (user_id, result) VALUES (?, ?)", (user_id, result))
     con.commit()
 
 
 # Get last result
-async def sql_baitest_last_result():
-    cur.execute("SELECT result FROM bai_test_results ORDER BY result_id DESC LIMIT 1")
+async def sql_baitest_last_result(user_id):
+    cur.execute("SELECT result FROM bai_test_results WHERE user_id=? ORDER BY result_id DESC LIMIT 1", (user_id,))
     result = cur.fetchall()
     return result
 
 # Get last week averege
-async def sql_baitest_lastweek_result():
-    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')")
+async def sql_baitest_lastweek_result(user_id):
+    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')", (user_id,))
     result = cur.fetchall()
     return result
 
 # Get a week before averege
-async def sql_baitest_previousweek_result():
-    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE date BETWEEN datetime('now', '-13 days') AND datetime('now', '-6 days')")
+async def sql_baitest_previousweek_result(user_id):
+    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-13 days') AND datetime('now', '-6 days')", (user_id,))
     result = cur.fetchall()
     return result
 
 # Get a current month averege
-async def sql_baitest_currentmonth_result():
-    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE date BETWEEN datetime('now', '-30 days') AND datetime('now', 'localtime')")
+async def sql_baitest_currentmonth_result(user_id):
+    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-30 days') AND datetime('now', 'localtime')", (user_id,))
     result = cur.fetchall()
     return result

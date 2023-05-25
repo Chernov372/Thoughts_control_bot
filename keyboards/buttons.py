@@ -59,8 +59,8 @@ bdi_test_start_kb.add(InlineKeyboardButton(text="Начать", callback_data="b
 
 # bdi test dinamics keyboard
 bdi_test_dinamics_kb = InlineKeyboardMarkup(row_width=1)
-bdi_test_dinamics_kb.add(InlineKeyboardButton(text="Начать", callback_data="begin_bdi_test"),
-                         InlineKeyboardButton(text="Сравнить с предыдущей неделей", callback_data="bdi_test_lastweek_change"),
+bdi_test_dinamics_kb.add(InlineKeyboardButton(text="Сравнить с предыдущей неделей", callback_data="bdi_test_lastweek_change"),
+                         InlineKeyboardButton(text="Изменения за последний месяц", callback_data="bdi_test_lastmonth_change"),
                          InlineKeyboardButton(text="В главное меню", callback_data="cancel"))
 
 # end of the bdi test

@@ -60,12 +60,11 @@ async def bai_test_questions(cbq: types.CallbackQuery, state=FSMContext):
 # Recording results
 async def bai_test_result_record(cbq: types.CallbackQuery, state=FSMContext):
     result = (await state.get_data())['sum']
-    print(await sqlite_db.sql_baitest_last_result())
     try:
-        last_result = (await sqlite_db.sql_baitest_last_result())[0][0]
+        last_result = (await sqlite_db.sql_baitest_last_result(cbq.message.chat.id))[0][0]
     except:
-        last_result = await sqlite_db.sql_baitest_last_result()
-    await sqlite_db.sql_baitest_insert_result(result)
+        last_result = await sqlite_db.sql_baitest_last_result(cbq.message.chat.id)
+    await sqlite_db.sql_baitest_insert_result(cbq.message.chat.id, result)
     if last_result == [] or result >= last_result:
         if result <= 21:
             await cbq.message.answer(f"""Вы прошли тест!\nВаш результат: {result} из 63\n\nЭтот результат указывает на то, что уровень вашей тревоги - незначителен.\n\n
@@ -98,8 +97,8 @@ async def bai_test_dinamic_choise(cbq: types.CallbackQuery):
 
 # comparing with a previous week
 async def bai_test_dinamics_lastresult(cbq: types.CallbackQuery):
-    last_week_results = (await sqlite_db.sql_baitest_lastweek_result())[0][0]
-    previous_week_result = (await sqlite_db.sql_baitest_previousweek_result())[0][0]
+    last_week_results = (await sqlite_db.sql_baitest_lastweek_result(cbq.message.chat.id))[0][0]
+    previous_week_result = (await sqlite_db.sql_baitest_previousweek_result(cbq.message.chat.id))[0][0]
     await cbq.message.delete()
     if last_week_results == None:
         await cbq.message.answer("Вы не проходили тест за последнюю неделю", reply_markup=bai_test_kb)
@@ -117,17 +116,19 @@ async def bai_test_dinamics_lastresult(cbq: types.CallbackQuery):
 
 # comparing last result with last 30 days averege
 async def bai_test_dinamic_lastmonth(cbq: types.CallbackQuery):
-    current_month_result = (await sqlite_db.sql_baitest_currentmonth_result())[0][0]
+    current_month_result = (await sqlite_db.sql_baitest_currentmonth_result(cbq.message.chat.id))[0][0]
     try:
-        last_result = (await sqlite_db.sql_baitest_last_result())[0][0]
+        last_result = (await sqlite_db.sql_baitest_last_result(cbq.message.chat.id))[0][0]
     except:
-        last_result = await sqlite_db.sql_baitest_last_result()
+        last_result = await sqlite_db.sql_baitest_last_result(cbq.message.chat.id)
     await cbq.message.delete()
     if last_result == []:
         await cbq.message.answer("Вы ещё ни разу не проходили тест на уровень депрессии", reply_markup=first_choise)
     else:
         if last_result < current_month_result:
             await cbq.message.answer(f"Вы делаете успехи!\nПоследний результат теста - {int(last_result)} из 63\n\nПо сравнению со средним значением за последние 30 дней, результат теста стал меньше на {int(current_month_result-last_result)}. Это может означать, что уровень Вашей тревоги снизился!\n\nНачнём с начала. Выберите раздел", reply_markup=first_choise)
+        elif last_result == current_month_result:
+            await cbq.message.answer(f"Последний результат теста - {int(last_result)} из 63\n\nПо сравнению со средним значением за последние 30 дней, результат теста не изменился. Продолжайте работу над собой и своими чувствами.\n\nНачнём сначала. Выберите раздел", reply_markup=first_choise)
         else:
             await cbq.message.answer(f"Последний результат теста - {int(last_result)} из 63\n\nПо сравнению со средним значением за последние 30 дней, результат теста стал больше на {int(current_month_result-last_result)}. Продолжайте работу над собой и своими чувствами.\n\nНачнём с начала. Выберите раздел", reply_markup=first_choise)
 
