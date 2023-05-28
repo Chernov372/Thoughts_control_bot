@@ -15,7 +15,7 @@ async def command_start(message: types.Message):
     await message.delete()
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
     scheduler.add_job(scheduled.achievement_reminder, trigger='date', run_date=datetime.now() + timedelta(seconds=10))
-    scheduler.add_job(scheduled.event_reminder, trigger='date', hour=datetime.now().hour, minute=datetime.now().minute+1, start_date=datetime.now())
+    scheduler.add_job(scheduled.event_reminder, trigger='cron', hour=22, minute=7, start_date=datetime.now())
     scheduler.start()
 
 # Choosing a gender
