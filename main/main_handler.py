@@ -2,9 +2,7 @@ from aiogram import types, Dispatcher
 from keyboards import first_choise, gender_choice_kb
 from create_bot import dp, bot
 from data_base import sqlite_db
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from main import scheduled
-from datetime import datetime, timedelta
+
 
 
 
@@ -13,10 +11,7 @@ async def command_start(message: types.Message):
     await message.answer('"Несчастным или счастливым человека делают только его мысли, а не внешние обстоятельства. Управляя своими мыслями, он управляет своим счастьем."\n\n—  Фридрих Вильгельм Ницше')
     await message.answer(f"Выберите пол:", reply_markup=gender_choice_kb)
     await message.delete()
-    scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
-    scheduler.add_job(scheduled.achievement_reminder, trigger='date', run_date=datetime.now() + timedelta(seconds=10))
-    scheduler.add_job(scheduled.event_reminder, trigger='cron', hour=22, minute=7, start_date=datetime.now())
-    scheduler.start()
+
 
 # Choosing a gender
 async def user_gender_choice(cbq: types.CallbackQuery):

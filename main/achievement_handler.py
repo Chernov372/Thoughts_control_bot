@@ -5,6 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from keyboards import achievements_choise, first_choise
 from create_bot import bot
 
+
 # ACHIEVEMENTS STARTING MESSAGE WITH BUTTONS
 
 async def achievements_start(cbq: types.CallbackQuery):
@@ -25,7 +26,6 @@ async def achievements_record(cbq: types.CallbackQuery, state=None):
 
 # Describing new achievement
 async def load_achievement(message: types.Message, state=FSMContext):
-
     async with state.proxy() as data:
         data['user_id'] = message.chat.id
         data['achievement'] = message.text
@@ -33,8 +33,9 @@ async def load_achievement(message: types.Message, state=FSMContext):
     await state.finish()
     await bot.delete_message(message.chat.id, message.message_id-1)
     await message.delete()
-    await message.answer(f"Chat id - {message.chat.id}")
+    # await message.answer(f"Chat id - {message.chat.id}")
     await message.answer("Отлично! Достижение добавлено!\n\nВы вернулись в главное меню.\nВыберите раздел:", reply_markup=first_choise)
+
 
 
 # COUNTING ACHIEVEMENTS BUTTON

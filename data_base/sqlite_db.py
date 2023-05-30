@@ -64,6 +64,16 @@ async def sql_user_gender_get(user_id):
     gender = cur.fetchall()
     return gender[0][0]
 
+async def sql_all_user_id_get():
+    cur.execute("SELECT user_id FROM users")
+    users = cur.fetchall()
+    return users[0]
+
+async def sql_user_first_name_get(user_id):
+    cur.execute("SELECT first_name FROM users WHERE user_id=?", (user_id,))
+    name = cur.fetchall()
+    return name[0][0]
+
 
 # EVENTS QUERIES
 
@@ -183,6 +193,7 @@ async def sql_bditest_last_result(user_id):
     result = cur.fetchall()
     return result
 
+
 # Get last week averege
 async def sql_bditest_lastweek_result(user_id):
     cur.execute("SELECT ROUND(AVG(result)) FROM bdi_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')", (user_id,))
@@ -217,7 +228,7 @@ async def sql_baitest_last_result(user_id):
 
 # Get last week averege
 async def sql_baitest_lastweek_result(user_id):
-    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-6 days') AND datetime('now', 'localtime')", (user_id,))
+    cur.execute("SELECT ROUND(AVG(result)) FROM bai_test_results WHERE user_id=? AND date BETWEEN datetime('now', '-1 days') AND datetime('now', 'localtime')", (user_id,))
     result = cur.fetchall()
     return result
 

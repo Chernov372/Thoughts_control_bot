@@ -45,6 +45,8 @@ bdi_test_answers_kb.add(InlineKeyboardButton(text="а", callback_data="bdi_test_
                         InlineKeyboardButton(text="г", callback_data="bdi_test_answer_3")
                         ).row(InlineKeyboardButton(text="В главное меню", callback_data="cancel"))
 
+
+
 # test first choise
 bdi_test_kb = InlineKeyboardMarkup(row_width=1)
 bdi_test_kb.add(InlineKeyboardButton(text="Пройти тест", callback_data="start_bdi_test"),
@@ -112,3 +114,7 @@ test_kb.add(InlineKeyboardButton(text="Уровень депрессии", callb
 gender_choice_kb = InlineKeyboardMarkup(row_width=1)
 gender_choice_kb.add(InlineKeyboardButton(text="Мужской", callback_data="gender_male"),
             InlineKeyboardButton(text="Женский", callback_data="gender_female"))
+
+# REMINDER KEYBOARD
+reminder_kb = InlineKeyboardMarkup(row_width=1)
+reminder_kb.add(InlineKeyboardButton(text="Спасибо за напоминание", callback_data="delete_reminder"))

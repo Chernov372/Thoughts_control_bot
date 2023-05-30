@@ -176,9 +176,9 @@ def register_handlers_bdi_test(dp: Dispatcher):
     dp.register_callback_query_handler(
         bdi_test_start, lambda c: c.data == 'start_bdi_test')
     dp.register_callback_query_handler(
-        bdi_test_questions, state=FSM_bdi_test_form.q)
+        bdi_test_questions, lambda c: c.data.startswith('bdi_test_answer_') or c.data == 'cancel' or 'begin_bdi_test',  state=FSM_bdi_test_form.q)
     dp.register_callback_query_handler(
-        bdi_test_result_record, state=FSM_bdi_test_form.result)
+        bdi_test_result_record, lambda c: c.data.startswith('bdi_test_end'), state=FSM_bdi_test_form.result)
     # bdi test dinamics handlers
     dp.register_callback_query_handler(bdi_test_dinamics_lastresult, lambda c: c.data == 'bdi_test_lastweek_change')
     dp.register_callback_query_handler(bdi_test_dinamic_lastmonth, lambda c: c.data == 'bdi_test_lastmonth_change')
