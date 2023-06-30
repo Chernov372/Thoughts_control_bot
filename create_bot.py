@@ -3,7 +3,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 
 
-TOKEN = "5886031842:AAHxo4Fiu6whccdIHFOFor4PMlFUY_ojPzA"
+TOKEN = ""
 
 storage = MemoryStorage()
 
